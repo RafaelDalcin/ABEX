@@ -15,10 +15,6 @@ const Paciente = sequelize.define(
       type: DataTypes.STRING(100),
       allowNull: false
     },
-    sexo: {
-      type: DataTypes.CHAR(1),
-      allowNull: false,
-    },
     cpf: {
       type: DataTypes.STRING(12),
       allowNull: false,

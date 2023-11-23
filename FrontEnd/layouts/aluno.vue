@@ -62,7 +62,9 @@
   
   <script>
   export default {
-    name: 'DefaultLayout',
+    name: 'aluno',
+    layout: 'default',
+    
     data () {
     return {
       clipped: false,

@@ -92,24 +92,6 @@ export default {
       drawer: false,
       fixed: false,
       items: [
-
-        {
-          icon: 'mdi-account-school',
-          title: 'Alunos',
-          to: '/alunos'
-        },
-
-        {
-          icon: 'mdi-account-group',
-          title: 'Grupos',
-          to: '/grupos'
-        },
-
-        {
-          icon: 'mdi-human-male-female-child',
-          title: 'Famílias',
-          to: '/familias'
-        },
         
       ],
       miniVariant: false,

@@ -4,7 +4,7 @@ export default function ({ $axios }, inject) {
 
   api.onResponse(resp => resp.data)
 
-  api.setBaseURL('http://localhost:5555')
+  api.setBaseURL('http://localhost:3333')
 
   inject('api', api)
 }
