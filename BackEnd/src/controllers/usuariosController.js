@@ -36,15 +36,17 @@ const login = async (dados, res) => {
         });
       }
 
-      let response = bcrypt.compare(password, usuario.passwordHash)
-
+      let response = await bcrypt.compare(password, usuario.passwordHash);
+      
       if (response) {
         return res.status(200).send({
           type: 'success',
           message: `Bem-vindo ${usuario.username} `,
           data: usuario.id
         });
-      }
+      } else {
+        throw new Error()
+      } 
 
     } catch (error) {
         return res.status(200).send({
@@ -104,25 +106,27 @@ const create = async (dados, res) => {
     if (usuarioExiste) {
       return res.status(200).send({
         type: 'error',
-        message: 'Já existe um usuário cadastrado com esse username!'
+        message: 'Já existe um usuário cadastrado com esse username!',
+      });
+    } 
+    else {
+      let passwordHash = await bcrypt.hash(senha, 10);
+
+      let response = await Usuario.create({
+        username,
+        email,
+        passwordHash,
+        ativo: true,
+        tipo,
+      });
+
+      return res.status(200).send({
+        type: 'success',
+        message: 'Usuário cadastrado com sucesso!',
+        data: response
       });
     }
 
-    let passwordHash = await bcrypt.hash(senha, 10);
-
-    let response = await Usuario.create({
-      username,
-      email,
-      passwordHash,
-      ativo: true,
-      tipo,
-    });
-
-    return res.status(200).send({
-      type: 'success',
-      message: 'Usuário cadastrado com sucesso!',
-      data: response
-    });
   } catch (error) {
       return res.status(200).send({
         type: 'error',

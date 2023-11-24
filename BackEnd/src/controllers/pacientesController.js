@@ -87,22 +87,36 @@ const persist = async (req, res) => {
 
 const create = async (dados, res) => {
     try {
+        console.log(dados)
         let {nome, cpf, dataNascimento, relacaoFamiliar, idUsuario, idFamilia} = dados;
-        
-        let response = await Paciente.create({
-            nome,
-            cpf,
-            dataNascimento,
-            relacaoFamiliar,
-            idUsuario,
-            idFamilia,
-        });
 
-        return res.status(200).send({
-            type: 'success',
-            message: 'Paciente cadastrado com sucesso!',
-            data: response
-        });
+        let pacienteExiste = await Paciente.findOne({
+            where: cpf
+        })
+
+        if(pacienteExiste){
+            return res.status(200).send({
+                type: 'error',
+                message: 'Já existe um paciente cadastrado para o CPF informado!'
+            })
+        } 
+        else {
+            let response = await Paciente.create({
+                nome,
+                cpf,
+                dataNascimento,
+                relacaoFamiliar,
+                idUsuario,
+                idFamilia,
+            });
+
+            return res.status(200).send({
+                type: 'success',
+                message: 'Paciente cadastrado com sucesso!',
+                data: response
+            });
+        }
+        
     } catch (error) {
         return res.status(200).send({
             type: 'error',
@@ -114,11 +128,12 @@ const create = async (dados, res) => {
 
 const update = async (id, dados, res) => {
     try {
+        console.log(dados)
         let {nome, cpf, dataNascimento, relacaoFamiliar, idUsuario, idFamilia} = dados;
 
         let paciente = await Paciente.findOne({
             where: {
-                id
+                id, cpf
             }
         })
 

@@ -54,7 +54,7 @@
                                                     </v-text-field>
                                                 </v-col>
                                                 <v-col cols="4">
-                                                    <v-text-field v-model="paciente.cpf" outlined required :rules="rule"
+                                                    <v-text-field v-mask="'###.###.###-##'" v-model="paciente.cpf" outlined required :rules="rule"
                                                         label="CPF">
 
                                                     </v-text-field>
@@ -248,12 +248,15 @@ export default {
         async adicionarUsuario() {
             try {
                 let usuario = this.preencherDadosUsuario();
-                let response = await this.$api.post('/usuarios/persist', usuario).then(res => res.data);
 
-                return response;
-
+                let response = await this.$api.post('/usuarios/persist', usuario);
+                if(response.data) {
+                    return response;
+                }
+                this.mensagemRetorno(response.type, response.message);
+                
             } catch (error) {
-
+                this.mensagemRetorno(response.type, response.message);
             }
         },
 
@@ -267,11 +270,12 @@ export default {
                 let paciente = this.preencherDadosPaciente(usuario);
 
                 let response = await this.$api.post('/pacientes/persist', paciente);
-                this.mensagemRetorno(response.type, response.message)
+                this.mensagemRetorno(response.type, response.message);
+
                 await this.buscarTodos();
 
             } catch (error) {
-                this.mensagemRetorno(response.type, response.message)
+                this.mensagemRetorno(response.type, response.message);
             }
 
         },
@@ -313,7 +317,6 @@ export default {
                 if(isConfirm) {
                     try {
                         let response = await this.$api.post('/pacientes/destroy', { id: paciente.id });
-                        console.log(response);
                         this.mensagemRetorno(response.type, response.message);
                         await this.buscarTodos();
                     } catch (error) {

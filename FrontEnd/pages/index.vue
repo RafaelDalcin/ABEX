@@ -58,8 +58,11 @@ export default {
 
 	methods: {
 		async login() {
+			let dados = {
+				username: this.usuario.username,
+				password: this.usuario.password
+			}
 
-			let dados = this.usuario
 			let response = await this.$api.post("http://localhost:3333/usuarios/login", dados);
 			if (response.data) {
 				this.$router.push({ name: 'home', params: { idUsuarioLogado: response.data } })
