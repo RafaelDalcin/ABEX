@@ -150,11 +150,14 @@ const destroy = async (req, res) => {
 
     await familia.destroy();
     return res.status(200).send({
-      message: `A família informada foi deletada com sucesso`
+      message: `A família informada foi deletada com sucesso`,
+      type: 'success'
     })
+
   } catch (error) {
-    return res.status(500).send({
-      message: error.message
+    return res.status(200).send({
+      message: 'A família informada não pode ser deletada pois está sendo utilizada em outros registros!',
+      type: 'error'
     })
   }
 }

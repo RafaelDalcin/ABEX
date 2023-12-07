@@ -151,11 +151,13 @@ const destroy = async (req, res) => {
 
     await grupo.destroy();
     return res.status(200).send({
-      message: `A grupo informado foi deletado com sucesso`
+      message: `A grupo informado foi deletado com sucesso`,
+      type: 'success'
     })
   } catch (error) {
-    return res.status(500).send({
-      message: error.message
+    return res.status(200).send({
+      message: 'O grupo não pode ser excluído pois está vinculado a um ou mais registros!',
+      type: 'error'
     })
   }
 }

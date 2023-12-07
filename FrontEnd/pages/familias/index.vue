@@ -47,7 +47,7 @@
 							<v-icon color="info" small class="mr-2" @click="atualizar(item)">
 								mdi-pencil
 							</v-icon>
-							<v-icon color="red" small @click="deletar(item)">
+							<v-icon color="red" small @click="excluirFamilia(item)">
 								mdi-delete
 							</v-icon>
 						</template>
@@ -99,18 +99,40 @@ export default {
 			this.familias = await this.$api.get('http://localhost:3333/familias').then(res => res.data);
 		},
 
-		async deletar(familia) {
-			try {
-				if (confirm(`Deseja deletar o grupo ${familia.descricao} ID - ${familia.id}`)) {
-					let response = await this.$api.post('http://localhost:3333/familias/destroy', { id: familia.id });
-					this.$toast.success(response.message);
-					this.getFamilias();
-				}
+		async excluirFamilia(familia) {
+            this.$swal({
+                title: 'Deletar família',
+                text: 'Você tem certeza que deseja deletar esse registro?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sim',
+                cancelButtonText: 'Não'
 
-			} catch (error) {
-				this.$toast.error('Ocorreu um erro ao deletar o registro');
-			}
-		},
+            }).then(async (isConfirm) => {
+                if (isConfirm.value) {
+                    try {
+                        let response = await this.$api.post('/familias/destroy', { id: familia.id });
+                        this.mensagemRetorno(response.type, response.message);
+
+                        await this.getFamilias();
+                    } catch (error) {
+                        this.mensagemRetorno(response.type, response.message);
+                    }
+                }
+            })
+        },
+
+		mensagemRetorno(resStatus, message) {
+            if (resStatus == 'success') {	
+                return this.$toast.success(message);
+            }
+            if (resStatus == 'error') {
+                return this.$toast.error(message);
+            }
+            if (resStatus == 'warning') {
+                return this.$toast.warning(message);
+            }
+        },
 
 		async adicionar() {
 			try {

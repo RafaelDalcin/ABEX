@@ -47,7 +47,7 @@
 							<v-icon color="info" small class="mr-2" @click="atualizar(item)">
 								mdi-pencil
 							</v-icon>
-							<v-icon color="red" small @click="deletar(item)">
+							<v-icon color="red" small @click="excluirGrupo(item)">
 								mdi-delete
 							</v-icon>
 						</template>
@@ -99,19 +99,40 @@ export default {
 			this.grupos = await this.$api.get('/grupos').then(res => res.data);
 		},
 
-		async deletar(grupo) {
-			try {
-				if (confirm(`Deseja deletar o grupo ${grupo.descricao} ID - ${grupo.id}`)) {
-					console.log(grupo.id)
-					let response = await this.$api.post('/grupos/destroy', { id: grupo.id });
-					this.$toast.success(response.message);
-					this.getGrupos();
-				}
+		async excluirGrupo(grupo) {
+            this.$swal({
+                title: 'Deletar grupo',
+                text: 'Você tem certeza que deseja deletar esse registro?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sim',
+                cancelButtonText: 'Não'
 
-			} catch (error) {
-				this.$toast.error('Ocorreu um erro ao deletar o registro');
-			}
-		},
+            }).then(async (isConfirm) => {
+                if (isConfirm.value) {
+                    try {
+                        let response = await this.$api.post('/grupos/destroy', { id: grupo.id });
+                        this.mensagemRetorno(response.type, response.message);
+
+                        await this.getGrupos();
+                    } catch (error) {
+                        this.mensagemRetorno(response.type, response.message);
+                    }
+                }
+            })
+        },
+
+		mensagemRetorno(resStatus, message) {
+            if (resStatus == 'success') {	
+                return this.$toast.success(message);
+            }
+            if (resStatus == 'error') {
+                return this.$toast.error(message);
+            }
+            if (resStatus == 'warning') {
+                return this.$toast.warning(message);
+            }
+        },
 
 		async limparCampos() {
 			this.grupo = {
