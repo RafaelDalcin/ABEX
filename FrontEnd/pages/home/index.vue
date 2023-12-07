@@ -19,11 +19,11 @@
 
 <script>
 export default {
-    layout: 'user',
+    layout: 'default',
     data() {
         return {
 
-            items: [{ titulo: 'Buscar famílias', icon: "mdi-human-male-male-child", to: "/familias" }, { titulo: 'Buscar pacientes', icon: "mdi-account-injury", to: '/pacientes' }, { titulo: 'Meu perfil', icon: "mdi-account" }]
+            items: [{ titulo: 'Buscar famílias', icon: "mdi-human-male-male-child", to: "/familias" }, { titulo: 'Buscar pacientes', icon: "mdi-account-injury", to: '/pacientes' }, { titulo: 'Buscar alunos', icon: "mdi-account-school", to: '/alunos'  }, { titulo: 'Grupos Enfermagem', icon: "mdi-account-group", to: '/grupos'  }]
 
         }
     }

@@ -21,8 +21,6 @@ const getAll = async (req, res) => {
         data: error.message
         });
     }
-
-    
 }
 
 const getById = async (req, res) => {
@@ -42,7 +40,7 @@ const getById = async (req, res) => {
             where: {
                 id
             },
-            include: ['usuario', 'grupo']
+            include: ['usuario', 'familia']
         })
     
         if(!paciente){
@@ -87,20 +85,8 @@ const persist = async (req, res) => {
 
 const create = async (dados, res) => {
     try {
-        console.log(dados)
+
         let {nome, cpf, dataNascimento, relacaoFamiliar, idUsuario, idFamilia} = dados;
-
-        let pacienteExiste = await Paciente.findOne({
-            where: cpf
-        })
-
-        if(pacienteExiste){
-            return res.status(200).send({
-                type: 'error',
-                message: 'Já existe um paciente cadastrado para o CPF informado!'
-            })
-        } 
-        else {
             let response = await Paciente.create({
                 nome,
                 cpf,
@@ -115,8 +101,7 @@ const create = async (dados, res) => {
                 message: 'Paciente cadastrado com sucesso!',
                 data: response
             });
-        }
-        
+
     } catch (error) {
         return res.status(200).send({
             type: 'error',

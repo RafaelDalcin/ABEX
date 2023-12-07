@@ -11,7 +11,7 @@ import Paciente from "./Paciente";
 
 //   await Grupo.sync({ force: true });
 //   await Familia.sync({ force: true });
-//   await Usuario.sync({ force: true });
+//   await Usuario.sync({ force: true }); 
 //   await Aluno.sync({ force: true });
 //   await Paciente.sync({ force: true });
 //   await Endereco.sync({ force: true });

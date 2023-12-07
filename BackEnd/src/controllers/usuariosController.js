@@ -1,4 +1,5 @@
 import { sequelize } from "../config";
+import Paciente from "../models/Paciente";
 import Usuario from "../models/Usuario";
 import bcrypt from 'bcrypt';
 
@@ -100,7 +101,7 @@ const create = async (dados, res) => {
     let usuarioExiste = await Usuario.findOne({
       where: {
         username
-      }
+      },
     });
 
     if (usuarioExiste) {
@@ -108,8 +109,7 @@ const create = async (dados, res) => {
         type: 'error',
         message: 'Já existe um usuário cadastrado com esse username!',
       });
-    } 
-    else {
+    }
       let passwordHash = await bcrypt.hash(senha, 10);
 
       let response = await Usuario.create({
@@ -125,7 +125,6 @@ const create = async (dados, res) => {
         message: 'Usuário cadastrado com sucesso!',
         data: response
       });
-    }
 
   } catch (error) {
       return res.status(200).send({

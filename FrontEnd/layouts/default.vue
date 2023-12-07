@@ -91,9 +91,7 @@ export default {
       clipped: false,
       drawer: false,
       fixed: false,
-      items: [
-        
-      ],
+      items: [{ title: 'Home', icon: "mdi-home", to: "/home" }, { title: 'Buscar famílias', icon: "mdi-human-male-male-child", to: "/familias" }, { title: 'Buscar pacientes', icon: "mdi-account-injury", to: '/pacientes' }, { title: 'Buscar alunos', icon: "mdi-account-school", to: '/alunos'  }, { title: 'Grupos Enfermagem', icon: "mdi-account-group", to: '/grupos'  }],
       miniVariant: false,
       right: true,
       rightDrawer: false,

@@ -18,7 +18,6 @@ const Paciente = sequelize.define(
     cpf: {
       type: DataTypes.STRING(18),
       allowNull: false,
-      unique: true
     },
     dataNascimento: {
       type: DataTypes.DATE,

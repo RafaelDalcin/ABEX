@@ -178,6 +178,10 @@ export default {
 	computed: {
 		tituloChange: function () {
 			return this.usuario.id > 0 ? 'Editar aluno' : 'Cadastrar aluno';
+		},
+
+		editMode: function () {
+			return this.usuario.id > 0 ? true : false;
 		}
 	},
 
@@ -188,27 +192,6 @@ export default {
 	},
 
 	methods: {
-        async excluirAluno (aluno) {
-            this.$swal({
-                title: 'Deletar aluno',
-                text:'Você tem certeza que deseja deletar esse registro?',
-                type: 'warning',
-                showCancelButton: true,
-                confirmButtonText:'Sim',
-                cancelButtonText: 'Não'
-
-            }).then(async (isConfirm) => {
-                if(isConfirm) {
-                    try {
-                        let response = await this.$api.post('/alunos/destroy', { id: aluno.id });
-                        this.mensagemRetorno(response.type, response.message);
-                        await this.buscarTodos();
-                    } catch (error) {
-                        this.mensagemRetorno(response.type, response.message);
-                    }                    
-                }
-            })
-        },
 
 
 		async limparCampos() {
@@ -254,6 +237,11 @@ export default {
 			} catch (error) {
 				this.$toast.error(error.message);
 			}
+		},
+
+		async buscarTodos() {
+			await this.getAlunos();
+			await this.getGrupos();
 		},
 
 		async adicionarUsuario() {
@@ -344,7 +332,43 @@ export default {
 			} catch (error) {
 
 			}
-		}
+		},
+
+		mensagemRetorno(resStatus, message) {
+            if (resStatus == 'success') {	
+                return this.$toast.success(message);
+            }
+            if (resStatus == 'error') {
+                return this.$toast.error(message);
+            }
+            if (resStatus == 'warning') {
+                return this.$toast.warning(message);
+            }
+        },
+
+		async excluirAluno(aluno) {
+            this.$swal({
+                title: 'Deletar aluno',
+                text: 'Você tem certeza que deseja deletar esse registro?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sim',
+                cancelButtonText: 'Não'
+
+            }).then(async (isConfirm) => {
+                if (isConfirm.value) {
+                    try {
+                        let response = await this.$api.post('/alunos/destroy', { id: aluno.id });
+                        await this.$api.post('/usuarios/destroy', { id: aluno.idUsuario });
+                        this.mensagemRetorno(response.type, response.message);
+                        await this.buscarTodos();
+
+                    } catch (error) {
+                        this.mensagemRetorno(response.type, response.message);
+                    }
+                }
+            })
+        },
 	}
 }
 </script>

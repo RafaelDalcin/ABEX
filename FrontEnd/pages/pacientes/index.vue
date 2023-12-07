@@ -54,8 +54,8 @@
                                                     </v-text-field>
                                                 </v-col>
                                                 <v-col cols="4">
-                                                    <v-text-field v-mask="'###.###.###-##'" v-model="paciente.cpf" outlined required :rules="rule"
-                                                        label="CPF">
+                                                    <v-text-field v-mask="'###.###.###-##'" v-model="paciente.cpf" outlined
+                                                        required :rules="rule" label="CPF">
 
                                                     </v-text-field>
                                                 </v-col>
@@ -112,8 +112,8 @@
                                     <v-container>
                                         <v-row>
                                             <v-col align="right">
-                                                <v-btn @click="adicionarPaciente" color="success">Salvar</v-btn>
-                                                <v-btn dark>Cancelar</v-btn>
+                                                <v-btn @click="adicionarUsuario" color="success">Salvar</v-btn>
+                                                <v-btn @click="limparCampos" dark>Cancelar</v-btn>
                                             </v-col>
                                         </v-row>
                                     </v-container>
@@ -208,9 +208,9 @@ export default {
 
     methods: {
 
-        async buscarTodos () {
+        async buscarTodos() {
             await this.buscarFamilias();
-            await this.buscarPacientes();    
+            await this.buscarPacientes();
         },
 
         async buscarPacientes() {
@@ -233,14 +233,14 @@ export default {
             return retorno
         },
 
-        preencherDadosPaciente(usuario) {
+        preencherDadosPaciente(usuarioId) {
             let retorno = {
                 nome: this.paciente.nomeCompleto,
                 cpf: this.paciente.cpf,
                 relacaoFamiliar: this.paciente.relacaoFamiliar,
                 dataNascimento: this.paciente.dataNasc,
                 idFamilia: this.paciente.idFamilia,
-                idUsuario: usuario.id
+                idUsuario: usuarioId
             }
             return retorno
         },
@@ -248,80 +248,105 @@ export default {
         async adicionarUsuario() {
             try {
                 let usuario = this.preencherDadosUsuario();
-
                 let response = await this.$api.post('/usuarios/persist', usuario);
-                if(response.data) {
-                    return response;
+
+                if (response.data) {
+                    await this.adicionarPaciente(response.data.id)
+                } else {
+                    return this.$toast.error(response.message);
                 }
-                this.mensagemRetorno(response.type, response.message);
-                
             } catch (error) {
-                this.mensagemRetorno(response.type, response.message);
             }
         },
 
-        async adicionarPaciente() {
+        async adicionarPaciente(usuarioId) {
             try {
-
                 if (!this.valid)
                     return this.$toast.warning("Preencha todos os campos!")
 
-                let usuario = await this.adicionarUsuario();
-                let paciente = this.preencherDadosPaciente(usuario);
-
+                let paciente = this.preencherDadosPaciente(usuarioId);
                 let response = await this.$api.post('/pacientes/persist', paciente);
-                this.mensagemRetorno(response.type, response.message);
+                if (response.data) {
+                    this.limparCampos();
+                    this.mensagemRetorno(response.type, response.message);
+                } else {
+                    this.mensagemRetorno(response.type, response.message);
+                }
+                
 
                 await this.buscarTodos();
 
             } catch (error) {
-                this.mensagemRetorno(response.type, response.message);
             }
 
         },
 
         mensagemRetorno(resStatus, message) {
-			if (resStatus == 'success') {
-				return this.$toast.success(message);
-			}
-			if (resStatus == 'error') {
-				return this.$toast.error(message);
-			}
-			if (resStatus == 'warning') {
-				return this.$toast.warning(message);
-			}
-		},
+            if (resStatus == 'success') {
+                return this.$toast.success(message);
+            }
+            if (resStatus == 'error') {
+                return this.$toast.error(message);
+            }
+            if (resStatus == 'warning') {
+                return this.$toast.warning(message);
+            }
+        },
 
-        async editarPaciente (paciente) {
-            try { 
-                let response = await this.$api.get(`/pacientes/${paciente.id}`);
+        async editarPaciente(paciente) {
+            try {
+                let response = await this.$api.get(`/pacientes/${paciente.id}`).then(res => res.data);
+                response.dataNascimento = response.dataNascimento.split('T')[0];
                 this.mensagemRetorno(response.type, response.message);
-                this.usuario = response.usuario;
-                this.paciente = response;
-                
+
+                this.paciente = {
+                    id: response.id,
+                    nomeCompleto: response.nome,
+                    cpf: response.cpf,
+                    dataNasc: response.dataNascimento,
+                    relacaoFamiliar: response.relacaoFamiliar,
+                    idUsuario: response.idUsuario,
+                    idFamilia: response.idFamilia
+                }
+
+                this.usuario = {
+                    id: response.idUsuario,
+                    username: response.usuario.username,
+                    senha: response.usuario.passwordHash,
+                    email: response.usuario.email,
+                    tipo: response.usuario.tipo,
+                }
+
             } catch (error) {
                 this.mensagemRetorno(response.type, response.message);
             }
         },
 
-        async excluirPaciente (paciente) {
+        limparCampos() {
+            this.$refs.form.reset();
+        },
+
+        async excluirPaciente(paciente) {
             this.$swal({
                 title: 'Deletar paciente',
-                text:'Você tem certeza que deseja deletar esse registro?',
+                text: 'Você tem certeza que deseja deletar esse registro?',
                 type: 'warning',
                 showCancelButton: true,
-                confirmButtonText:'Sim',
+                confirmButtonText: 'Sim',
                 cancelButtonText: 'Não'
 
             }).then(async (isConfirm) => {
-                if(isConfirm) {
+                if (isConfirm.value) {
                     try {
                         let response = await this.$api.post('/pacientes/destroy', { id: paciente.id });
+                        await this.$api.post('/usuarios/destroy', { id: paciente.idUsuario });
+
                         this.mensagemRetorno(response.type, response.message);
+
                         await this.buscarTodos();
                     } catch (error) {
                         this.mensagemRetorno(response.type, response.message);
-                    }                    
+                    }
                 }
             })
         }
@@ -336,7 +361,6 @@ export default {
     
 <style>
 .swal2-popup {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif
 }
-
 </style>
