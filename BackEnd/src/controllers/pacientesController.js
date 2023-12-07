@@ -118,7 +118,7 @@ const update = async (id, dados, res) => {
 
         let paciente = await Paciente.findOne({
             where: {
-                id, cpf
+                id,
             }
         })
 
@@ -129,7 +129,7 @@ const update = async (id, dados, res) => {
             });
         }
 
-        Object.keys(dados).forEach(field => item[field] = dados[field]);
+        Object.keys(dados).forEach(field => paciente[field] = dados[field]);
 
         await paciente.save();
         return res.status(200).send({

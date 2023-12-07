@@ -31,14 +31,6 @@
                             Detalhes
                             <v-icon>mdi-card-account-details</v-icon>
                         </v-tab>
-                        <v-tab href="#tab2">
-                            Endereço
-                            <v-icon>mdi-map-marker</v-icon>
-                        </v-tab>
-                        <v-tab href="#tab3">
-                            Prontuário
-                            <v-icon>mdi-form-select</v-icon>
-                        </v-tab>
                         <v-tab-item value="tab1">
                             <v-card>
                                 <v-card-title>Cadadstro paciente</v-card-title>
@@ -86,25 +78,44 @@
                                                     </v-menu>
                                                 </v-col>
                                             </v-row>
-                                            <v-row>
-                                                <v-col>
-                                                    <v-text-field v-model="usuario.username" required :rules="rule" outlined
-                                                        label="Usuário"></v-text-field>
-                                                </v-col>
-                                                <v-col>
-                                                    <v-text-field v-model="usuario.senha" required :rules="rule"
-                                                        type="password" outlined label="Senha"></v-text-field>
-                                                </v-col>
-                                                <v-col>
-                                                    <v-text-field v-model="usuario.email" required :rules="rule" outlined
-                                                        label="E-mail"></v-text-field>
-                                                </v-col>
-                                                <v-col>
-                                                    <v-autocomplete v-model="paciente.idFamilia" :items="familias"
-                                                        item-text="descricao" item-value="id" outlined label="Família"
-                                                        required :rules="rule" placeholder="Família"></v-autocomplete>
-                                                </v-col>
-                                            </v-row>
+                                            <div v-if="showPassowrd">
+                                                <v-row>
+                                                    <v-col>
+                                                        <v-text-field v-model="usuario.username" required :rules="rule" outlined
+                                                            label="Usuário"></v-text-field>
+                                                    </v-col>
+                                                    <v-col>
+                                                        <v-text-field v-model="usuario.senha" required :rules="rule"
+                                                            type="password"  outlined label="Senha"></v-text-field>
+                                                    </v-col>
+                                                    <v-col>
+                                                        <v-text-field v-model="usuario.email" required :rules="rule" outlined
+                                                            label="E-mail"></v-text-field>
+                                                    </v-col>
+                                                    <v-col>
+                                                        <v-autocomplete v-model="paciente.idFamilia" :items="familias"
+                                                            item-text="descricao" item-value="id" outlined label="Família"
+                                                            required :rules="rule" placeholder="Família"></v-autocomplete>
+                                                    </v-col>
+                                                </v-row>
+                                            </div>
+                                            <div v-else>
+                                                <v-row>
+                                                    <v-col>
+                                                        <v-text-field v-model="usuario.username" required :rules="rule" outlined
+                                                            label="Usuário"></v-text-field>
+                                                    </v-col>
+                                                    <v-col>
+                                                        <v-text-field v-model="usuario.email" required :rules="rule" outlined
+                                                            label="E-mail"></v-text-field>
+                                                    </v-col>
+                                                    <v-col>
+                                                        <v-autocomplete v-model="paciente.idFamilia" :items="familias"
+                                                            item-text="descricao" item-value="id" outlined label="Família"
+                                                            required :rules="rule" placeholder="Família"></v-autocomplete>
+                                                    </v-col>
+                                                </v-row>
+                                            </div>
                                         </v-container>
                                     </v-form>
                                 </v-card-item>
@@ -132,6 +143,7 @@ export default {
     data() {
         return {
 
+            showPassowrd: true,
             pacientes: [],
             familias: [],
 
@@ -164,7 +176,7 @@ export default {
             },
 
             tab: null,
-            itemsTab: ['Detalhes', 'Endereço', 'Prontuário'],
+            itemsTab: ['Detalhes'],
 
             headers: [
                 {
@@ -235,6 +247,7 @@ export default {
 
         preencherDadosPaciente(usuarioId) {
             let retorno = {
+                id: this.paciente.id,
                 nome: this.paciente.nomeCompleto,
                 cpf: this.paciente.cpf,
                 relacaoFamiliar: this.paciente.relacaoFamiliar,
@@ -248,7 +261,7 @@ export default {
         async adicionarUsuario() {
             try {
                 let usuario = this.preencherDadosUsuario();
-                let response = await this.$api.post('/usuarios/persist', usuario);
+                let response = await this.$api.post('/usuarios/persist', usuario)
 
                 if (response.data) {
                     await this.adicionarPaciente(response.data.id)
@@ -295,6 +308,7 @@ export default {
 
         async editarPaciente(paciente) {
             try {
+                this.showPassowrd = false;
                 let response = await this.$api.get(`/pacientes/${paciente.id}`).then(res => res.data);
                 response.dataNascimento = response.dataNascimento.split('T')[0];
                 this.mensagemRetorno(response.type, response.message);
@@ -323,6 +337,8 @@ export default {
         },
 
         limparCampos() {
+            this.showPassowrd = true;
+            this.usuario.senha = ""
             this.$refs.form.reset();
         },
 

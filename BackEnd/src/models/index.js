@@ -21,13 +21,13 @@ import Paciente from "./Paciente";
 // });
 // createTables();
 
-// const dropTables = (async () => {
+const dropTables = (async () => {
 
-//   await Aluno.drop({ force: true })
-//   await MembroFamilia.drop({ force: true })
-//   await Grupo.drop({ force: true })
-//   await Familia.drop({ force: true })
+  await Aluno.drop({ force: true })
+  await MembroFamilia.drop({ force: true })
+  await Grupo.drop({ force: true })
+  await Familia.drop({ force: true })
 
-// });
+});
 
 // dropTables();

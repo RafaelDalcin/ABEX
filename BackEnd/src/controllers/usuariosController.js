@@ -137,7 +137,7 @@ const create = async (dados, res) => {
 
 const update = async (id, dados, res) => {
   try {
-    let { username, email } = dados;  
+    let { username, email, senha, tipo  } = dados;  
 
     let usuario = await Usuario.findOne({
       where: {
@@ -152,13 +152,14 @@ const update = async (id, dados, res) => {
       });
     }
     
-    Object.keys(dados).forEach(field => category[field] = dados[field]);
+    Object.keys(dados).forEach(field => usuario[field] = dados[field]);
+
 
     await usuario.save()
     return res.status(200).send({
       type: 'success',
       message: 'Usuário atualizado com sucesso!',
-      data: response
+      data: usuario
     });
   } catch (error) {
     return res.status(200).send({
