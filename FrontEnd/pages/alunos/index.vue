@@ -15,8 +15,7 @@
 							</v-card-title>
 							<v-card-text>
 								<v-form ref="form" v-model="valid">
-
-									<v-container>
+									<v-container v-if="showPassword">
 										<v-row>
 											<v-col cols="12">
 												<v-text-field v-model="aluno.nome" outlined label="Nome" required
@@ -29,6 +28,39 @@
 											<v-col cols="6">
 												<v-text-field type="password" v-model="usuario.senha" outlined label="Senha"
 													required :rules="rule" placeholder="Senha"></v-text-field>
+											</v-col>
+											<v-col cols="12">
+												<v-text-field v-model="usuario.email" outlined label="E-mail" required
+													:rules="rule" placeholder="E-mail"></v-text-field>
+											</v-col>
+											<v-col cols="4">
+												<v-text-field v-model="aluno.matricula" outlined label="Matrícula" required
+													:rules="rule" placeholder="Matrícula"></v-text-field>
+											</v-col>
+											<v-col cols="8">
+												<v-text-field v-model="aluno.curso" outlined label="Curso" required
+													:rules="rule" placeholder="Curso"></v-text-field>
+											</v-col>
+											<v-col cols="4">
+												<v-text-field v-model="aluno.semestre" outlined label="Semestre" required
+													:rules="rule" placeholder="Semestre"></v-text-field>
+											</v-col>
+											<v-col cols="8">
+												<v-autocomplete v-model="aluno.idGrupo" :items="grupos"
+													item-text="descricao" item-value="id" outlined label="Grupo" required
+													:rules="rule" placeholder="Grupo"></v-autocomplete>
+											</v-col>
+										</v-row>
+									</v-container>
+									<v-container v-else>
+										<v-row>
+											<v-col cols="12">
+												<v-text-field v-model="aluno.nome" outlined label="Nome" required
+													placeholder="Nome" :rules="rule"></v-text-field>
+											</v-col>
+											<v-col cols="12">
+												<v-text-field v-model="usuario.username" outlined label="Username" required
+													:rules="rule" placeholder="Username"></v-text-field>
 											</v-col>
 											<v-col cols="12">
 												<v-text-field v-model="usuario.email" outlined label="E-mail" required
@@ -96,6 +128,7 @@ export default {
 		return {
 			title: '',
 			valid: false,
+			showPassword: true,
 
 			editMode: false,
 
@@ -213,6 +246,7 @@ export default {
 					tipo: 'aluno',
 				}
 
+			this.showPassword = true;
 			this.valid = true;
 			this.dialog = false;
 			this.$refs.form.reset();
@@ -274,6 +308,7 @@ export default {
 
 		async editarAluno(aluno) {
 			try {
+				this.showPassword = false;
 				this.editMode = true;
 				let response = await this.$api.get(`http://localhost:3333/alunos/${aluno.id}`).then(res => res.data);
 				this.dialog = true;
